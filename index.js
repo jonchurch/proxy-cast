@@ -1,3 +1,4 @@
+
 var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -27,8 +28,9 @@ server.get('/forecast/hourly/:lat,:lon', function(req, res) {
             res.status(500).json({
                 msg: err
             });
-        });
+
 });
+    });
 
 server.get('/forecast/daily/:lat,:lon', function(req, res) {
     $http.get(baseUrl + apiKey + '/' + req.params.lat + ',' + req.params.lon)
