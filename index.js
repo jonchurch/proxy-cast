@@ -1,17 +1,19 @@
-var express = require('express');
-var cors = require('cors');
-var bodyParser = require('body-parser');
-var $http = require('axios');
-var port = process.env.PORT || 3000;
-var apiKey = require('./config.js').apiKey;
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const $http = require('axios');
+const logger = require('./logger');
 
-var server = express();
-var baseUrl = 'https://api.forecast.io/forecast/';
+const server = express();
+const apiKey = require('./config.js').apiKey;
+const port = process.env.PORT || 3000;
+const baseUrl = 'https://api.forecast.io/forecast/';
 
 //Middleware
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cors());
+server.use(logger);
 
 server.get('/forecast/hourly/:lat,:lon', function(req, res) {
     $http.get(baseUrl + apiKey + '/' + req.params.lat + ',' + req.params.lon)
@@ -32,7 +34,7 @@ server.get('/forecast/hourly/:lat,:lon', function(req, res) {
 });
 
 server.get('/forecast/daily/:lat,:lon', function(req, res) {
-    $http.get(baseUrl + apiKey + '/' + requ.params.lat + ',' + req.params.lon)
+    $http.get(baseUrl + apiKey + '/' + req.params.lat + ',' + req.params.lon)
         .then(function(response) {
             var overSummary = response.data.daily.summary;
             var overIcon = response.data.daily.icon;
@@ -44,7 +46,7 @@ server.get('/forecast/daily/:lat,:lon', function(req, res) {
                     tempMax: dailyData[i].temperatureMax,
                     tempMin: dailyData[i].temperatureMin,
                     humidity: dailyData[i].humidity,
-                    precipProb: dailydata[i].precipProbability
+                    precipProb: dailyData[i].precipProbability
                 };
 
                 dailyArr.push(o);
@@ -56,15 +58,13 @@ server.get('/forecast/daily/:lat,:lon', function(req, res) {
                     icon: overIcon,
                     daily: dailyArr
                 };
-                console.log(resObj);
-                res.status(200).json(resObj);
-            }
-        })
+            } //end for loop
+            res.status(200).json(dailyArr);
+
+        })//end .then
         .catch(function(err) {
             console.log(err);
-            res.status(500).json({
-                msg: err
-            });
+            res.status(500).json({ msg: err });
         });
 });
 
