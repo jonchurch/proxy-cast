@@ -6,7 +6,7 @@ const logger = require('./logger');
 const authorize = require('./auth');
 
 const server = express();
-const apiKey = require('./config.js').apiKey;
+const apiKey = process.env.APIKEY || require('./config.js').apiKey;
 const port = process.env.PORT || 3000;
 const baseUrl = 'https://api.forecast.io/forecast/';
 
